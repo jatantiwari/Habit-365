@@ -156,7 +156,7 @@ export default function Dashboard({ onDailyClick }: DashboardProps) {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2 text-balance">Habit Tracker 365</h1>
+          <h1 className="text-4xl font-bold text-foreground mb-2 text-balance">Productive 365</h1>
           <p className="text-muted-foreground text-balance">
             Track your daily and weekly habits with detailed analytics
           </p>

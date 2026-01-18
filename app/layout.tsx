@@ -8,7 +8,7 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Habit Tracker 365",
+  title: "Productive 365",
   description: "Track your daily and weekly habits with analytics and insights",
   generator: "v0.app",
   icons: {

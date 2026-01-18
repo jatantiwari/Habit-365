@@ -265,7 +265,7 @@ export default function SettingsDialog({ onClose }: SettingsDialogProps) {
           <div className="border-t border-border pt-4 mt-4">
             <h3 className="font-semibold text-foreground mb-3">About</h3>
             <p className="text-sm text-muted-foreground mb-3">
-              Habit Tracker 365 helps you build and maintain consistent habits throughout the year.
+              Productive 365 helps you build and maintain consistent habits throughout the year.
             </p>
             <p className="text-xs text-muted-foreground">
               Data is stored locally on your device. No data is sent to any server.

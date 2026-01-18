@@ -187,7 +187,7 @@ export default function MonthlyView() {
             </div>
           </div>
 
-          {/* Habit Tracker Grid */}
+          {/* Productive Grid */}
           {monthlyData.habits.length > 0 ? (
             <HabitGrid
               habits={monthlyData.habits}
