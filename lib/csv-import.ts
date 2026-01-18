@@ -24,15 +24,15 @@ export function importCSVData(csvContent: string): Record<string, any> {
     december: 11,
   }
 
-  // Group data by month, then by habit
-  const dataByMonth: Record<string, Record<string, Record<number, boolean>>> = {}
+  // Group data by month, then by habit with metadata
+  const dataByMonth: Record<string, Record<string, { days: Record<number, boolean>; type?: string; time?: string }>> = {}
 
   dataLines.forEach((line) => {
     const parts = line.split(",").map((s) => s.trim())
 
     if (parts.length < 5) return
 
-    const [yearStr, monthStr, dayStr, habitName, completedStr] = parts
+    const [yearStr, monthStr, dayStr, habitName, completedStr, typeStr = "daily", timeStr = ""] = parts
 
     const year = Number.parseInt(yearStr)
     const monthLower = monthStr.toLowerCase()
@@ -51,10 +51,14 @@ export function importCSVData(csvContent: string): Record<string, any> {
     }
 
     if (!dataByMonth[monthKey][habitName]) {
-      dataByMonth[monthKey][habitName] = {}
+      dataByMonth[monthKey][habitName] = {
+        days: {},
+        type: typeStr || "daily",
+        time: timeStr || undefined,
+      }
     }
 
-    dataByMonth[monthKey][habitName][day] = isCompleted
+    dataByMonth[monthKey][habitName].days[day] = isCompleted
   })
 
   // Create MonthData objects with exact completion data
@@ -65,17 +69,25 @@ export function importCSVData(csvContent: string): Record<string, any> {
     const habitArray: any[] = []
     const completions: Record<string, boolean[]> = {}
 
-    Object.entries(habits).forEach(([habitName, dayCompletions]) => {
-      const habitId = `habit-${Date.now()}-${Math.random()}`
-      habitArray.push({
+    Object.entries(habits).forEach(([habitName, habitData]) => {
+      const habitId = `habit-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+      const habitType = habitData.type || "daily"
+
+      const habitObj: any = {
         id: habitId,
         name: habitName,
-        type: "daily",
+        type: habitType,
         createdAt: new Date().toISOString(),
-      })
+      }
+
+      if (habitData.time) {
+        habitObj.time = habitData.time
+      }
+
+      habitArray.push(habitObj)
 
       const completionArray = Array(daysInMonth).fill(false)
-      Object.entries(dayCompletions).forEach(([dayIndex, completed]) => {
+      Object.entries(habitData.days).forEach(([dayIndex, completed]) => {
         const idx = Number.parseInt(dayIndex)
         if (idx >= 0 && idx < daysInMonth) {
           completionArray[idx] = completed

@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import CopyHabitsDialog from "./copy-habits-dialog"
+import BackupManager from "./backup-manager"
 
 interface SettingsDialogProps {
   onClose: () => void
@@ -12,7 +13,8 @@ interface SettingsDialogProps {
 export default function SettingsDialog({ onClose }: SettingsDialogProps) {
   const [exportMessage, setExportMessage] = useState("")
   const [importError, setImportError] = useState("")
-  const [showCopyDialog, setShowCopyDialog] = useState(false) // added state for copy dialog
+  const [showCopyDialog, setShowCopyDialog] = useState(false)
+  const [showBackupManager, setShowBackupManager] = useState(false)
 
   const handleExportCSV = () => {
     try {
@@ -23,7 +25,7 @@ export default function SettingsDialog({ onClose }: SettingsDialogProps) {
       }
 
       const data = JSON.parse(monthlyData)
-      let csv = "Year,Month,Day,Habit,Completed\n"
+      let csv = "Year,Month,Day,Habit,Completed,Type,Time\n"
 
       Object.entries(data).forEach(([key, value]: any) => {
         const [year, month] = key.split("-")
@@ -47,7 +49,9 @@ export default function SettingsDialog({ onClose }: SettingsDialogProps) {
             const completionArray = value.completions[habit.id] || []
             completionArray.forEach((completed: boolean, dayIndex: number) => {
               const day = dayIndex + 1
-              csv += `${year},${monthNames[Number.parseInt(month)]},${day},${habit.name},${completed ? "yes" : "no"}\n`
+              const habitType = habit.type || "daily"
+              const habitTime = habit.time || ""
+              csv += `${year},${monthNames[Number.parseInt(month)]},${day},${habit.name},${completed ? "yes" : "no"},${habitType},${habitTime}\n`
             })
           })
         }
@@ -217,6 +221,21 @@ export default function SettingsDialog({ onClose }: SettingsDialogProps) {
           </button>
 
           <button
+            onClick={() => setShowBackupManager(true)}
+            className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-smooth font-medium text-left flex items-center justify-between"
+          >
+            <span>Manage Backups</span>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </button>
+
+          <button
             onClick={handleClearData}
             className="w-full px-4 py-3 bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90 transition-smooth font-medium text-left flex items-center justify-between"
           >
@@ -271,6 +290,8 @@ export default function SettingsDialog({ onClose }: SettingsDialogProps) {
           onClose={() => setShowCopyDialog(false)}
         />
       )}
+
+      {showBackupManager && <BackupManager onClose={() => setShowBackupManager(false)} />}
     </div>
   )
 }

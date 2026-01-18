@@ -24,6 +24,30 @@ export default function DailyView({ onClose }: DailyViewProps) {
     loadTodayHabits()
   }, [today])
 
+  const isHabitTodayValid = (habit: any, day: number): boolean => {
+    if (!habit.type || habit.type === "daily") {
+      return true // Daily habits always apply
+    }
+
+    if (habit.type === "specific-days" && habit.weekDays) {
+      // Check if today's day of week matches
+      const dayOfWeek = today.getDay()
+      return habit.weekDays.includes(dayOfWeek)
+    }
+
+    if (habit.type === "one-time" && habit.specificDate) {
+      // Check if today matches the specific date
+      const habitDate = new Date(habit.specificDate)
+      return (
+        habitDate.getDate() === today.getDate() &&
+        habitDate.getMonth() === today.getMonth() &&
+        habitDate.getFullYear() === today.getFullYear()
+      )
+    }
+
+    return false
+  }
+
   const loadTodayHabits = () => {
     const monthKey = `${today.getFullYear()}-${today.getMonth()}`
     const saved = localStorage.getItem("monthlyData")
@@ -33,10 +57,13 @@ export default function DailyView({ onClose }: DailyViewProps) {
         const monthData = data[monthKey]
         if (monthData && monthData.habits) {
           const day = today.getDate() - 1
-          const dailyHabits = monthData.habits.map((habit: any) => ({
+          const filteredHabits = monthData.habits.filter((habit: any) => isHabitTodayValid(habit, day))
+
+          const dailyHabits = filteredHabits.map((habit: any) => ({
             id: habit.id,
             name: habit.name,
-            time: habit.time, // Added time field
+            time: habit.time,
+            type: habit.type || "daily",
             completed: monthData.completions[habit.id]?.[day] ?? false,
           }))
           setHabits(dailyHabits)
@@ -199,11 +226,20 @@ export default function DailyView({ onClose }: DailyViewProps) {
                           </svg>
                         )}
                       </div>
-                      <div>
-                        <p className={`font-medium ${habit.completed ? "text-accent" : "text-foreground"}`}>
-                          {habit.name}
-                        </p>
-                        {habit.time && <p className="text-xs text-muted-foreground">{habit.time}</p>}
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className={`font-medium ${habit.completed ? "text-accent" : "text-foreground"}`}>
+                            {habit.name}
+                          </p>
+                          <span className="text-xs px-2 py-0.5 bg-primary/10 text-primary rounded-full capitalize">
+                            {habit.type === "specific-days"
+                              ? "Weekly"
+                              : habit.type === "one-time"
+                                ? "Once"
+                                : "Daily"}
+                          </span>
+                        </div>
+                        {habit.time && <p className="text-xs text-muted-foreground mt-1">{habit.time}</p>}
                       </div>
                     </button>
                     <button

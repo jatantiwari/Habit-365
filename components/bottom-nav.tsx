@@ -1,14 +1,16 @@
 "use client"
 
+import { useState } from "react"
 import { useTheme } from "./theme-provider"
 
 interface BottomNavProps {
   currentView: string
-  onViewChange: (view: "dashboard" | "monthly" | "add" | "settings") => void
+  onViewChange: (view: "dashboard" | "monthly" | "add-daily" | "add-weekly" | "add-one-time" | "settings") => void
 }
 
 export default function BottomNav({ currentView, onViewChange }: BottomNavProps) {
   const { isDarkMode, setIsDarkMode } = useTheme()
+  const [showAddMenu, setShowAddMenu] = useState(false)
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-lg z-50">
@@ -51,21 +53,58 @@ export default function BottomNav({ currentView, onViewChange }: BottomNavProps)
           <span className="text-xs sm:text-sm font-medium hidden sm:block">Monthly</span>
         </button>
 
-        <button
-          onClick={() => onViewChange("add")}
-          className="flex flex-col items-center justify-center gap-0.5 sm:gap-1 flex-1 min-h-16 sm:min-h-20 py-2 sm:py-3 text-primary transition-smooth hover:scale-110"
-        >
-          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-full flex items-center justify-center text-primary-foreground">
-            <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-          <span className="text-xs sm:text-sm font-medium hidden sm:block">Add</span>
-        </button>
+        <div className="relative flex-1 flex flex-col items-center justify-center">
+          <button
+            onClick={() => setShowAddMenu(!showAddMenu)}
+            className="flex flex-col items-center justify-center gap-0.5 sm:gap-1 w-full min-h-16 sm:min-h-20 py-2 sm:py-3 text-primary transition-smooth hover:scale-110"
+          >
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-full flex items-center justify-center text-primary-foreground">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+            <span className="text-xs sm:text-sm font-medium hidden sm:block">Add</span>
+          </button>
+
+          {showAddMenu && (
+            <div className="absolute bottom-full mb-2 bg-card border border-border rounded-lg shadow-lg p-2 w-48 z-50">
+              <button
+                onClick={() => {
+                  onViewChange("add-daily")
+                  setShowAddMenu(false)
+                }}
+                className="w-full text-left px-4 py-2 hover:bg-secondary rounded-lg transition-colors text-foreground mb-1"
+              >
+                <div className="font-medium">Daily Habit</div>
+                <div className="text-xs text-muted-foreground">Every day of the month</div>
+              </button>
+              <button
+                onClick={() => {
+                  onViewChange("add-weekly")
+                  setShowAddMenu(false)
+                }}
+                className="w-full text-left px-4 py-2 hover:bg-secondary rounded-lg transition-colors text-foreground mb-1"
+              >
+                <div className="font-medium">Weekly Habit</div>
+                <div className="text-xs text-muted-foreground">Specific days only (Mon, Fri, etc.)</div>
+              </button>
+              <button
+                onClick={() => {
+                  onViewChange("add-one-time")
+                  setShowAddMenu(false)
+                }}
+                className="w-full text-left px-4 py-2 hover:bg-secondary rounded-lg transition-colors text-foreground"
+              >
+                <div className="font-medium">One-Time Habit</div>
+                <div className="text-xs text-muted-foreground">Specific date only</div>
+              </button>
+            </div>
+          )}
+        </div>
 
         <button
           onClick={() => onViewChange("settings")}

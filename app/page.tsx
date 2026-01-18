@@ -5,12 +5,15 @@ import Dashboard from "@/components/dashboard"
 import MonthlyView from "@/components/monthly-view"
 import DailyView from "@/components/daily-view"
 import AddHabitDialog from "@/components/add-habit-dialog"
+import AddWeeklyHabitDialog from "@/components/add-weekly-habit-dialog"
+import AddOneTimeHabitDialog from "@/components/add-one-time-habit-dialog"
 import BottomNav from "@/components/bottom-nav"
 import SettingsDialog from "@/components/settings-dialog"
 import { ThemeProvider } from "@/components/theme-provider"
 import { requestNotificationPermission, checkAndTriggerNotifications } from "@/lib/notification-service"
+import { initializeDailyBackup } from "@/lib/backup-service"
 
-type ViewType = "dashboard" | "monthly" | "daily" | "add" | "settings"
+type ViewType = "dashboard" | "monthly" | "daily" | "add-daily" | "add-weekly" | "add-one-time" | "settings"
 
 export default function Home() {
   const [currentView, setCurrentView] = useState<ViewType>("dashboard")
@@ -20,6 +23,7 @@ export default function Home() {
   useEffect(() => {
     setIsHydrated(true)
     requestNotificationPermission()
+    initializeDailyBackup()
     const savedTheme = localStorage.getItem("theme")
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
     const shouldBeDark = savedTheme ? savedTheme === "dark" : prefersDark
@@ -70,17 +74,7 @@ export default function Home() {
   }
 
   const handleViewChange = (view: ViewType) => {
-    if (view === "settings") {
-      setCurrentView("settings")
-    } else if (view === "add") {
-      setCurrentView("add")
-    } else if (view === "monthly") {
-      setCurrentView("monthly")
-    } else if (view === "daily") {
-      setCurrentView("daily")
-    } else {
-      setCurrentView("dashboard")
-    }
+    setCurrentView(view)
   }
 
   return (
@@ -89,7 +83,9 @@ export default function Home() {
         {currentView === "dashboard" && <Dashboard onDailyClick={() => setCurrentView("daily")} />}
         {currentView === "monthly" && <MonthlyView />}
         {currentView === "daily" && <DailyView onClose={() => setCurrentView("dashboard")} />}
-        {currentView === "add" && <AddHabitDialog onClose={() => setCurrentView("dashboard")} />}
+        {currentView === "add-daily" && <AddHabitDialog onClose={() => setCurrentView("dashboard")} />}
+        {currentView === "add-weekly" && <AddWeeklyHabitDialog onClose={() => setCurrentView("dashboard")} />}
+        {currentView === "add-one-time" && <AddOneTimeHabitDialog onClose={() => setCurrentView("dashboard")} />}
         {currentView === "settings" && <SettingsDialog onClose={() => setCurrentView("dashboard")} />}
       </div>
       <BottomNav currentView={currentView} onViewChange={handleViewChange} />

@@ -3,10 +3,12 @@
 export interface Habit {
   id: string
   name: string
-  type: "daily" | "weekly"
+  type: "daily" | "weekly" | "specific-days" | "one-time"
   createdAt: string
   category?: string
   time?: string // Optional time in HH:MM format
+  weekDays?: number[] // 0-6 for specific days (Mon-Sun)
+  specificDate?: string // ISO date string for one-time habits
 }
 
 export interface MonthData {
